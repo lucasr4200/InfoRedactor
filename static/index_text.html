@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Box Layout</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="instructions">
+            <p>Enter text below:</p>
+        </div>
+        <div class="textbox">
+            <input type="text" id="inputField" placeholder="Type something...">
+            <button id="submitButton">Submit</button>
+        </div>
+        <div class="output">
+            <p id="outputText">Output:</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("submitButton").addEventListener("click", async () => {
+            const inputText = document.getElementById("inputField").value;
+            const response = await fetch("/redact/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ text: inputText })
+            });
+            const data = await response.json();
+
+            document.getElementById("outputText").innerText = "Output: " + data.redacted_text;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Redaction</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="instructions">
+            <p>Select a file to upload for redaction:</p>
+        </div>
+        <div class="file-upload">
+            <label for="pdfUpload">Upload PDF:</label>
+            <input type="file" id="pdfUpload" accept=".pdf">
+            <button id="uploadPdfButton">Upload and Redact PDF</button>
+        </div>
+        <div class="file-upload">
+            <label for="wordUpload">Upload Word Document:</label>
+            <input type="file" id="wordUpload" accept=".docx">
+            <button id="uploadWordButton">Upload and Redact Word Document</button>
+        </div>
+        <div class="output">
+            <p id="outputText">Output:</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("uploadPdfButton").addEventListener("click", async () => {
+            const fileInput = document.getElementById("pdfUpload");
+            const file = fileInput.files[0];
+            if (!file) {
+                alert("Please select a PDF file.");
+                return;
+            }
+            const formData = new FormData();
+            formData.append("file", file);
+
+            try {
+                const response = await fetch("/upload_pdf/", {
+                    method: "POST",
+                    body: formData
+                });
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'redacted.pdf';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                } else {
+                    alert("Failed to upload and redact PDF.");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("An error occurred while processing the file.");
+            }
+        });
+
+        document.getElementById("uploadWordButton").addEventListener("click", async () => {
+            const fileInput = document.getElementById("wordUpload");
+            const file = fileInput.files[0];
+            if (!file) {
+                alert("Please select a Word document.");
+                return;
+            }
+            const formData = new FormData();
+            formData.append("file", file);
+
+            try {
+                const response = await fetch("/upload_word/", {
+                    method: "POST",
+                    body: formData
+                });
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'redacted.docx';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                } else {
+                    alert("Failed to upload and redact Word document.");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("An error occurred while processing the file.");
+            }
+        });
+    </script>
+</body>
+</html>
